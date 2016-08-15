@@ -15,6 +15,8 @@ What are the other requirements?
 Install gpsd first if you want gps support.
 The GUI component requires FLTK and fluid.
 
+On ubuntu, install `gpsd libfltk1.1 libgps22`
+
 
 How do I build this?
 

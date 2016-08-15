@@ -9,7 +9,7 @@ the Free Software Foundation, either version 2 of the License, or
 
 obdgpslogger is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
@@ -164,7 +164,7 @@ struct obdiiprotocol {
 	enum protocol_headertype headertype;
 };
 
-/// All the protocols I know or care about 
+/// All the protocols I know or care about
 /** Borrowed from the ELM327 datasheet */
 static struct obdiiprotocol VARIABLE_IS_NOT_USED obdprotocols[] = {
 	{ '0', "Automatic", OBDHEADER_NULL },
@@ -216,7 +216,6 @@ static const struct option longopts[] = {
 	{ "launch-logger", no_argument, NULL, 'o' }, ///< Launch obdgpslogger
 	{ "launch-screen", no_argument, NULL, 'c' }, ///< Launch screen
 	{ "tty-device", required_argument, NULL, 't' }, ///< Open this actual device instead of a pty
-	{ "tcp-port", required_argument, NULL, 'T' }, ///< TCP port
 #endif //OBDPLATFORM_POSIX
 #ifdef OBDPLATFORM_WINDOWS
 	{ "com-port", required_argument, NULL, 'w' }, ///< Windows com port to open

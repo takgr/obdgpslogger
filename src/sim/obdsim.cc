@@ -9,7 +9,7 @@ the Free Software Foundation, either version 2 of the License, or
 
 obdgpslogger is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
@@ -39,7 +39,6 @@ along with obdgpslogger.  If not, see <http://www.gnu.org/licenses/>.
 #include <fcntl.h>
 
 #include "posixsimport.h"
-#include "tcpsimport.h"
 #endif //OBDPLATFORM_POSIX
 
 #ifdef OBDPLATFORM_WINDOWS
@@ -237,9 +236,7 @@ int main(int argc, char **argv) {
 
 	// If you should open a real device instead of a pty
 	char *tty_device = NULL;
-	
-	// listen port for socket sim port
-	unsigned short listen_port = 0;
+
 #endif //OBDPLATFORM_POSIX
 
 #ifdef HAVE_BLUETOOTH
@@ -253,12 +250,12 @@ int main(int argc, char **argv) {
 
 	// Logfilen name
 	char *logfile_name = NULL;
-	
+
 #ifdef OBDPLATFORM_WINDOWS
 	// Windows port to open
 	char *winport = NULL;
 #endif //OBDPLATFORM_WINDOWS
-	
+
 	// Iterator/index into ecus
 	int current_ecu = 0;
 
@@ -371,9 +368,6 @@ int main(int argc, char **argv) {
 				}
 				tty_device = strdup(optarg);
 				break;
-			case 'T':
-				listen_port = (unsigned short)atoi(optarg);
-				break;
 #endif //OBDPLATFORM_POSIX
 #ifdef OBDPLATFORM_WINDOWS
 			case 'w':
@@ -416,7 +410,7 @@ int main(int argc, char **argv) {
 
 	if(mustexit) return 0;
 
-	
+
 	int initialisation_errors = 0;
 	int i;
 	for(i=0;i<ss.ecu_count;i++) {
@@ -444,12 +438,7 @@ int main(int argc, char **argv) {
 #endif //HAVE_BLUETOOTH
 
 #ifdef OBDPLATFORM_POSIX
-		if(listen_port != 0) {
-			sp = new TCPSimPort(listen_port);
-		}
-		else {
-			sp = new PosixSimPort(tty_device);
-		}
+        sp = new PosixSimPort(tty_device);
 #endif //OBDPLATFORM_POSIX
 
 #ifdef OBDPLATFORM_WINDOWS
@@ -479,7 +468,15 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
+    // Save slave_name to local file
+    FILE *f_slave;
+
+    f_slave = fopen("pty_name.txt", "w");
+    fprintf(f_slave, slave_name);
+    fclose(f_slave);
+
 	printf("SimPort name: %s\n", slave_name);
+    setenv("SIMPORT_NAME", slave_name, 1);
 
 #ifdef OBDPLATFORM_POSIX
 	if(launch_logger) {
@@ -671,7 +668,6 @@ void printhelp(const char *argv0) {
 		"   [-o|--launch-logger]\n"
 		"   [-c|--launch-screen] [\"EXIT\" or C-a,k to exit]\n"
 		"   [-t|--tty-device=<real /dev/ entry to open>]\n"
-		"   [-T|--tcp-port=<port>]\n"
 #endif //OBDPLATFORM_POSIX
 #ifdef OBDPLATFORM_WINDOWS
 		"   [-w|--com-port=<windows COM port>]\n"
@@ -709,11 +705,11 @@ void printgenerator(int verbose) {
 		int is_default = !strcmp(DEFAULT_SIMGEN, available_generators[i]->name());
 		if(is_default) found_default = 1;
 		if(verbose) {
-			printf(" \"%s\"%s\n", 
+			printf(" \"%s\"%s\n",
 				available_generators[i]->name(),
 				is_default?" (default)":"");
 		} else {
-			printf("%s%s\n", 
+			printf("%s%s\n",
 				is_default?"* ":"  ",
 				available_generators[i]->name());
 		}
